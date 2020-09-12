@@ -19,6 +19,7 @@ public abstract class BaseDAO<T> {
 	protected String findAllSql = null;
 	protected String findWhereSql = null;
 	protected String findNoWhereSql = null;
+	protected String findCountSql = null;
 	private String dbName = null;
 	private String tableName = null;
 	private String tableColumn = "";
@@ -73,6 +74,18 @@ public abstract class BaseDAO<T> {
 			throw new Exception("请添加@NoWhere注解");
 		}
 	}
+
+	private void generateCountSql() throws Exception {
+		findCountSql = "select count(*) from " + tableName;
+		if (!"".equals(tableWhere)) {
+			findCountSql = findCountSql + " where "+tableWhere;
+		} else {
+			throw new Exception("请添加@Where注解");
+		}
+		if (!"".equals(tableNoWhere)) {
+			findCountSql = findCountSql +" " + tableNoWhere;
+		}
+	}
 	
 	private void generateWhereSql() throws Exception {
 		if (!"".equals(tableWhere)) {
@@ -83,6 +96,39 @@ public abstract class BaseDAO<T> {
 		if (!"".equals(tableNoWhere)) {
 			findWhereSql = findWhereSql +" " + tableNoWhere;
 		}
+	}
+
+	/**
+	 * 没有@NoWhere注解即没有where语句的方式查询
+	 * @return
+	 * @throws SQLException
+	 */
+	public int findCountSql(Object ...strs) throws SQLException {
+		int count = 0;
+		try {
+			generateCountSql();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		PreparedStatement pstat = connection.getStatement(findCountSql);
+		if (strs != null && strs.length > 0) {
+			for (int i = 1 ; i <= strs.length ; i++) {
+				pstat.setObject(i, strs[i-1]);
+				System.out.println("第"+i+"个参数值："+strs[i-1]);
+			}
+		}
+		ResultSet resultSet = pstat.executeQuery();
+		if(resultSet != null) {
+			try {
+				while(resultSet.next()){
+					count = resultSet.getInt(1);
+				}
+				resultSet.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return count;
 	}
 	
 	/**

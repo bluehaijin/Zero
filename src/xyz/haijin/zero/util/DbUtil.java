@@ -53,8 +53,8 @@ public final class DbUtil {
 	}
 	
 	/**
-	 * 拿到对应的数据库链接数据
-	 * @param novelSiteEnum
+	 * 鎷垮埌鏁版嵁搴撳搴旂殑閾炬帴
+	 * @param name
 	 * @return
 	 */
 	public static Map<String,String> getContext(String name){
