@@ -58,7 +58,9 @@ public abstract class BaseDAO<T> {
 					}
 				}
 			} else {
-				tableColumn += ","+field.getAnnotation(Column.class).value();
+				if (field.getAnnotation(Column.class) != null) {
+					tableColumn += "," + field.getAnnotation(Column.class).value();
+				}
 			}
 		}
 		System.out.println("tableColumn:"+tableColumn);

@@ -12,7 +12,6 @@ import xyz.haijin.zero.Where;
 public class User {
 	@ID("f_user_username")
 	private String userName;
-	@Column("f_user_password")
 	private String password;
 	@Column("f_user_realname")
 	private String realName;
