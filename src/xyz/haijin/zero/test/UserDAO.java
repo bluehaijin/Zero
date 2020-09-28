@@ -21,6 +21,7 @@ public class UserDAO extends BaseDAO<User>{
 //		dao.save(user);
 		System.out.println(dao.findWhereSql("我爱海鲸",10));
 //		System.out.println(dao.findCountSql("我爱海鲸",10));
+		System.out.println(dao.findCountSql());
 	}
 
 }

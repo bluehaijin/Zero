@@ -16,6 +16,7 @@ public class User {
 	@Column("f_user_realname")
 	private String realName;
 	@Column("f_user_sex")
+
 	private String sex;
 	@Column("f_user_register_time")
 	private String registerTime;
