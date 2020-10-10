@@ -19,7 +19,8 @@ public class UserDAO extends BaseDAO<User>{
 //		user.setRegisterTime("202009130123");
 //		user.setSex("男");
 //		dao.save(user);
-		System.out.println(dao.findWhereSql("我爱海鲸",10));
+		dao.setVersionWhere("通过性别查询");
+		System.out.println(dao.findWhereSql("男",10));
 //		System.out.println(dao.findCountSql("我爱海鲸",10));
 		System.out.println(dao.findCountSql());
 	}

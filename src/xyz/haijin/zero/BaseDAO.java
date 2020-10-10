@@ -1,5 +1,8 @@
 package xyz.haijin.zero;
 
+import xyz.haijin.zero.bean.NoWhereBean;
+import xyz.haijin.zero.bean.WhereBean;
+
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,18 +35,18 @@ public abstract class BaseDAO<T> {
 	private Map<String, Field> fieldMap = new HashMap<String, Field>();
 	private List<String> fieldList = new ArrayList<String>();
 
+	private List<WhereBean> whereBeans = null;
+	private List<NoWhereBean> noWhereBeans = null;
+
 	protected BaseDAO(Class<T> clazz, String db) {
 		dbName = db;
 		connection = DbFactory.getInstance(db);
 		beanClass = clazz;
 		tableName = clazz.getAnnotation(Table.class).value();
-		if (clazz.getAnnotation(Where.class) != null) {
-			tableWhere = clazz.getAnnotation(Where.class).value();
-		}
-		
-		if (clazz.getAnnotation(NoWhere.class) != null) {
-			tableNoWhere = clazz.getAnnotation(NoWhere.class).value();
-		}
+
+		initWhere();
+		initNoWhere();
+
 		
 		System.out.println("tableName:"+tableName);
 		for(Field field : clazz.getDeclaredFields()) {
@@ -67,6 +70,73 @@ public abstract class BaseDAO<T> {
 		initFieldMap();
 		findByIdSql = "select "+tableColumn+" from " + tableName + " where `" + id2 + "`=%s";
 		findAllSql = "select "+tableColumn+" from " + tableName;
+	}
+
+	private void initNoWhere(){
+		if (beanClass.getAnnotation(NoWhere.class) != null) {
+			String[] versions = beanClass.getAnnotation(NoWhere.class).version();
+			String[] values = beanClass.getAnnotation(NoWhere.class).value();
+			if (versions == null || "".equals(versions[0])) {
+				tableNoWhere = values != null ? values[0] : "";
+			} else {
+				if(values.length == versions.length){
+					noWhereBeans = new ArrayList<>();
+					for (int i = 0 ; i < values.length ; i++) {
+						NoWhereBean noWhereBean = new NoWhereBean();
+						noWhereBean.setVersion(versions[i]);
+						noWhereBean.setValue(values[i]);
+						noWhereBeans.add(noWhereBean);
+					}
+				}
+			}
+		}
+	}
+
+	private void initWhere(){
+		if (beanClass.getAnnotation(Where.class) != null) {
+			String[] versions = beanClass.getAnnotation(Where.class).version();
+			String[] values = beanClass.getAnnotation(Where.class).value();
+			if (versions == null || "".equals(versions[0])) {
+				tableWhere = values != null ? values[0] : "";
+			} else {
+				if(values.length == versions.length){
+					whereBeans = new ArrayList<>();
+					for (int i = 0 ; i < values.length ; i++) {
+						WhereBean whereBean = new WhereBean();
+						whereBean.setVersion(versions[i]);
+						whereBean.setValue(values[i]);
+						whereBeans.add(whereBean);
+					}
+				}
+
+			}
+		}
+	}
+
+	public void setVersionWhere(String version) {
+		WhereBean whereBean = null;
+		for (int i = 0 ; i < whereBeans.size() ; i++) {
+			if (whereBeans.get(i).getVersion().equals(version)) {
+				whereBean = whereBeans.get(i);
+				break;
+			}
+		}
+		if (whereBean != null) {
+			tableWhere = whereBean.getValue();
+		}
+	}
+
+	public void setVersionNoWhere(String version) {
+		NoWhereBean noWhereBean = null;
+		for (int i = 0 ; i < noWhereBeans.size() ; i++) {
+			if (noWhereBeans.get(i).getVersion().equals(version)) {
+				noWhereBean = noWhereBeans.get(i);
+				break;
+			}
+		}
+		if (noWhereBeans != null) {
+			tableNoWhere = noWhereBean.getValue();
+		}
 	}
 	
 	private void generateNoWhereSql() throws Exception {

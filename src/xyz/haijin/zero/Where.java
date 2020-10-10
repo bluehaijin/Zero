@@ -11,6 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 @Documented
 public @interface Where {
 
-    public String value() default "";
+    public String[] value() default "";
+    public String[] version() default "";
 
 }

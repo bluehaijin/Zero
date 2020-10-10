@@ -7,7 +7,7 @@ import xyz.haijin.zero.Table;
 import xyz.haijin.zero.Where;
 
 @Table("article_user")
-@Where("f_user_username = ?")
+@Where(value = {"f_user_username = ?","f_user_sex = ?"},version = {"通过用户名称查询","通过性别查询"})
 @NoWhere("limit ?")
 public class User {
 	@ID("f_user_username")
@@ -16,7 +16,6 @@ public class User {
 	@Column("f_user_realname")
 	private String realName;
 	@Column("f_user_sex")
-
 	private String sex;
 	@Column("f_user_register_time")
 	private String registerTime;
